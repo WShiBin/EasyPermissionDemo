@@ -223,6 +223,11 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 
 ### 所有流程图大致如下
 ![](https://shibin1990.gitbooks.io/the-ordinary-road/assets/EasyPermission.png)
+ **图中1,2,3所指情况:**
+
+1. App从未申请过权限,第一次申请权限时
+2. App权限申请被拒绝过
+3. App申请权限时,用户勾选了不在询问选项,并拒绝
 
 ### 最后EasyPermission还提供了一个可供选择的注解:AfterPermissionGranted
 方法注解,注解中参数是申请权限的请求码.
