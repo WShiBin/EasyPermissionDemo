@@ -33,30 +33,31 @@ Android 6.0以前在Manifest.xml中去加权限,说明这个App有这个权限�
 ###1. 引入EasyPermission
 ```
 dependencies {
-compile 'pub.devrel:easypermissions:0.3.0'
+	compile 'pub.devrel:easypermissions:0.3.0'
 }
 ```
 
 ###2. 重写Activity或Fragment中的onRequestPermissionsResult方法
 并在其中调用EasyPermissions.onRequestPermissionsResult来请求回调,必需加
+
 ```
 public class UseEasyPermissionMainActivity extends AppCompatActivity {
 
-private static final String TAG = "UseEasyPermission";
-private static final int RC_CAMERA_AND_RECORD_AUDIO = 10000;
+	private static final String TAG = "UseEasyPermission";
+	private static final int RC_CAMERA_AND_RECORD_AUDIO = 10000;
 
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_main);
-}
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
 
-@Override
-public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-// Forward results to EasyPermissions
-EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-}
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		// Forward results to EasyPermissions
+		EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+	}
 }
 ```
 
@@ -70,181 +71,183 @@ EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResult
 ```
 public class MainActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks {
 
-@Override
-protected void onCreate(Bundle savedInstanceState) {
-super.onCreate(savedInstanceState);
-setContentView(R.layout.activity_main);
-findViewById(R.id.btn_requst).setOnClickListener(new View.OnClickListener() {
-@Override
-public void onClick(View v) {
-requestPermissions();
-}
-});
-}
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		findViewById(R.id.btn_requst).setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				requestPermissions();
+			}
+		});
+	}
 
-@Override
-public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-// Forward results to EasyPermissions
-EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-}
+	@Override
+	public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		// Forward results to EasyPermissions
+		EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+	}
+	
+	/**
+	* 去申请权限
+	*/
+	private void requestPermissions() {
+		String[] perms = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+		
+		//判断有没有权限
+		if (EasyPermissions.hasPermissions(this, perms)) {
+			// 如果有权限了, 就做你该做的事情
+			openCamera();
+		} else {
+			// 如果没有权限, 就去申请权限
+			// this: 上下文
+			// Dialog显示的正文
+			// RC_CAMERA_AND_RECORD_AUDIO 请求码, 用于回调的时候判断是哪次申请
+			// perms 就是你要申请的权限
+			EasyPermissions.requestPermissions(this, "写上你需要用权限的理由, 是给用户看的", RC_CAMERA_AND_RECORD_AUDIO, perms);
+		}
+	}
+	
+	/**
+	* 权限申请成功的回调
+	*
+	* @param requestCode 申请权限时的请求码
+	* @param perms 申请成功的权限集合
+	*/
+	@Override
+	public void onPermissionsGranted(int requestCode, List<String> perms) {
+		Log.i(TAG, "onPermissionsGranted: ");
+		openCamera();
+	}
 
-/**
-* 去申请权限
-*/
-private void requestPermissions() {
-String[] perms = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-
-//判断有没有权限
-if (EasyPermissions.hasPermissions(this, perms)) {
-// 如果有权限了, 就做你该做的事情
-openCamera();
-} else {
-// 如果没有权限, 就去申请权限
-// this: 上下文
-// Dialog显示的正文
-// RC_CAMERA_AND_RECORD_AUDIO 请求码, 用于回调的时候判断是哪次申请
-// perms 就是你要申请的权限
-EasyPermissions.requestPermissions(this, "写上你需要用权限的理由, 是给用户看的", RC_CAMERA_AND_RECORD_AUDIO, perms);
-}
-}
-/**
-* 权限申请成功的回调
-*
-* @param requestCode 申请权限时的请求码
-* @param perms 申请成功的权限集合
-*/
-@Override
-public void onPermissionsGranted(int requestCode, List<String> perms) {
-Log.i(TAG, "onPermissionsGranted: ");
-openCamera();
-}
-
-/**
-* 权限申请拒绝的回调
-*
-* @param requestCode 申请权限时的请求码
-* @param perms 申请拒绝的权限集合
-*/
-@Override
-public void onPermissionsDenied(int requestCode, List<String> perms) {
-Log.i(TAG, "onPermissionsDenied: ");
+	/**
+	* 权限申请拒绝的回调
+	*
+	* @param requestCode 申请权限时的请求码
+	* @param perms 申请拒绝的权限集合
+	*/
+	@Override
+	public void onPermissionsDenied(int requestCode, List<String> perms) {
+		Log.i(TAG, "onPermissionsDenied: ");
+	}
 }
 ```
 这时候可以把打开相机调用的代码放在onPermissionsGranted中,如果你同时申请了多个权限,也可以在回调中判断做相应的操作:
 
 ```
-/**
-* 权限申请成功的回调
-*
-* @param requestCode 申请权限时的请求码
-* @param perms 申请成功的权限集合
-*/
-@Override
-public void onPermissionsGranted(int requestCode, List<String> perms) {
-Log.i(TAG, "onPermissionsGranted: ");
-if (requestCode != RC_CAMERA_AND_RECORD_AUDIO) {
-return;
-}
-for (int i = 0; i < perms.size(); i++) {
-if (perms.get(i).equals(Manifest.permission.CAMERA)) {
-Log.i(TAG, "onPermissionsGranted: " + "相机权限成功");
-openCamera();
+	/**
+	* 权限申请成功的回调
+	*
+	* @param requestCode 申请权限时的请求码
+	* @param perms 申请成功的权限集合
+	*/
+	@Override
+	public void onPermissionsGranted(int requestCode, List<String> perms) {
+		Log.i(TAG, "onPermissionsGranted: ");
+		if (requestCode != RC_CAMERA_AND_RECORD_AUDIO) {
+			return;
+		}
+		for (int i = 0; i < perms.size(); i++) {
+			if (perms.get(i).equals(Manifest.permission.CAMERA)) {
+				Log.i(TAG, "onPermissionsGranted: " + "相机权限成功");
+				openCamera();
+			
+			} else if (perms.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
+				Log.i(TAG, "onPermissionsGranted: " + "录制音频权限成功");
+			}
+		}
+	}
 
-} else if (perms.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
-Log.i(TAG, "onPermissionsGranted: " + "录制音频权限成功");
-}
-}
-}
-
-/**
-* 权限申请拒绝的回调
-*
-* @param requestCode 申请权限时的请求码
-* @param perms 申请拒绝的权限集合
-*/
-@Override
-public void onPermissionsDenied(int requestCode, List<String> perms) {
-Log.i(TAG, "onPermissionsDenied: ");
-
-if (requestCode != RC_CAMERA_AND_RECORD_AUDIO) {
-return;
-}
-
-for (int i = 0; i < perms.size(); i++) {
-if (perms.get(i).equals(Manifest.permission.CAMERA)) {
-Log.i(TAG, "onPermissionsDenied: " + "相机权限拒绝");
-} else if (perms.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
-Log.i(TAG, "onPermissionsDenied: " + "录制音频权限拒绝");
-}
-}
-}
-}
+	/**
+	* 权限申请拒绝的回调
+	*
+	* @param requestCode 申请权限时的请求码
+	* @param perms 申请拒绝的权限集合
+	*/
+	@Override
+	public void onPermissionsDenied(int requestCode, List<String> perms) {
+		Log.i(TAG, "onPermissionsDenied: ");
+		
+		if (requestCode != RC_CAMERA_AND_RECORD_AUDIO) {
+			return;
+		}
+	
+		for (int i = 0; i < perms.size(); i++) {
+			if (perms.get(i).equals(Manifest.permission.CAMERA)) {
+				Log.i(TAG, "onPermissionsDenied: " + "相机权限拒绝");
+			} else if (perms.get(i).equals(Manifest.permission.RECORD_AUDIO)) {
+				Log.i(TAG, "onPermissionsDenied: " + "录制音频权限拒绝");
+			}
+		}
+	}
 ```
 
 还有一个问题是:如果权限申请对话一直弹,用户也觉得烦,这时候Android在对话框上加了一个不在询问的勾选框,这时候在怎么requestPermission都不会弹出那个让用户选择允许或者拒绝的对话框了.App还需要使用相机的权限只能去:设置->应用->当前应用->权限,里面去开启权限,这时候可以在申请拒绝的回调onPermissionsDenied中做相应的引导操作:转跳到设置页面去手动开启权限.
 
 
 ```
-/**
-* 权限申请拒绝的回调
-*
-* @param requestCode 申请权限时的请求码
-* @param perms 申请拒绝的权限集合
-*/
-@Override
-public void onPermissionsDenied(int requestCode, List<String> perms) {
-Log.i(TAG, "onPermissionsDenied: ");
-//如果有一些权限被永久的拒绝, 就需要转跳到 设置-->应用-->对应的App下去开启权限
-if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-new AppSettingsDialog.Builder(this)
-.setTitle("权限已经被您拒绝")
-.setRationale("如果不打开权限则无法使用该功能,点击确定去打开权限")
-.setRequestCode(10001)//用于onActivityResult回调做其它对应相关的操作
-.build()
-.show();
-}
-}
+	/**
+	* 权限申请拒绝的回调
+	*
+	* @param requestCode 申请权限时的请求码
+	* @param perms 申请拒绝的权限集合
+	*/
+	@Override
+	public void onPermissionsDenied(int requestCode, List<String> perms) {
+		Log.i(TAG, "onPermissionsDenied: ");
+		//如果有一些权限被永久的拒绝, 就需要转跳到 设置-->应用-->对应的App下去开启权限
+		if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+			new AppSettingsDialog.Builder(this)
+				.setTitle("权限已经被您拒绝")
+				.setRationale("如果不打开权限则无法使用该功能,点击确定去打开权限")
+				.setRequestCode(10001)//用于onActivityResult回调做其它对应相关的操作
+				.build()
+				.show();
+		}
+	}
 ```
 
-最后,从设置页面转跳回来也可以做一些相应的操作
+最后,从设置页面转跳回来也可以做一些相应的操作  
+
 ```
-@Override
-public void onActivityResult(int requestCode, int resultCode, Intent data) {
-super.onActivityResult(requestCode, resultCode, data);
-if (requestCode == 10001) {
-Toast.makeText(this, " 从开启权限的页面转跳回来 ", Toast.LENGTH_SHORT).show();
-}
-}
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == 10001) {
+			Toast.makeText(this, " 从开启权限的页面转跳回来 ", Toast.LENGTH_SHORT).show();
+		}
+	}
 ```
 
 ###所有流程图大致如下
-![](/assets/EasyPermission.png)
+![](https://shibin1990.gitbooks.io/the-ordinary-road/assets/EasyPermission.png)
 
 ###最后EasyPermission还提供了一个可供选择的注解:AfterPermissionGranted
 方法注解,注解中参数是申请权限的请求码.
 被@AfterPermissionGranted注解的方法会在请求码中的所有权限申请成功之后被调用
 
 ```
-/**
-* 去申请权限
-*/
-@AfterPermissionGranted(RC_CAMERA_AND_RECORD_AUDIO)
-private void requestPermissions() {
-String[] perms = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
-
-//判断有没有权限
-if (EasyPermissions.hasPermissions(this, perms)) {
-// 如果有权限了, 就做你该做的事情
-// doing something
-openCamera();
-} else {
-// 如果没有权限, 就去申请权限
-// this: 上下文
-// Dialog显示的正文
-// RC_CAMERA_AND_RECORD_AUDIO 请求码, 用于回调的时候判断是哪次申请
-// perms 就是你要申请的权限
-EasyPermissions.requestPermissions(this, "写上你需要用权限的理由, 是给用户看的", RC_CAMERA_AND_RECORD_AUDIO, perms);
-}
-}
+	/**
+	* 去申请权限
+	*/
+	@AfterPermissionGranted(RC_CAMERA_AND_RECORD_AUDIO)
+	private void requestPermissions() {
+		String[] perms = {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
+		
+		//判断有没有权限
+		if (EasyPermissions.hasPermissions(this, perms)) {
+			// 如果有权限了, 就做你该做的事情
+			// doing something
+			openCamera();
+		} else {
+			// 如果没有权限, 就去申请权限
+			// this: 上下文
+			// Dialog显示的正文
+			// RC_CAMERA_AND_RECORD_AUDIO 请求码, 用于回调的时候判断是哪次申请
+			// perms 就是你要申请的权限
+			EasyPermissions.requestPermissions(this, "写上你需要用权限的理由, 是给用户看的", RC_CAMERA_AND_RECORD_AUDIO, perms);
+		}
+	}
 ```
