@@ -4,11 +4,11 @@
 
 项目地址:https://github.com/googlesamples/easypermissions
 
-##情况是这样的
+## 情况是这样的
 试想一下,一个App在未经允许的情况下,能获取你的联系人资料,用相机给你拍照上传,这是多么危险的一件事情.支付宝就有这么一个操作,用前置相机悄悄的给你拍照上传.
 Android在6.0更新时,加入了这样一个功能,对于手机的某些敏感资源,如相机,麦克风,联系人资料,电话,短信,相册...需要用户同意,App才能拥有使用相关资源的能力
 
-###哪些是权限是需要申请的?
+### 哪些是权限是需要申请的?
 官方文档:https://developer.android.google.cn/guide/topics/security/permissions.html#normal-dangerous
 
 | 权限组 | 权限 |
@@ -23,21 +23,21 @@ Android在6.0更新时,加入了这样一个功能,对于手机的某些敏感�
 | SMS(短信) | SEND_SMS / RECEIVE_SMS / READ_SMS / RECEIVE_WAP_PUSH / RECEIVE_MMS |
 | STORAGE(存储) | READ_EXTERNAL_STORAGE / WRITE_EXTERNAL_STORAGE |
 
-###Note:
+### Note:
 Android 6.0以前在Manifest.xml中去加权限,说明这个App有这个权限了,而现在,对于这些危险权限来说,在Manifest中只能算是声明,去告诉系统,这个App需要这个权限,但有没有这个权限,用户来决定.
 
-###在Android 6.0以上未加入权限申请,去接使用功能会怎样?
+### 在Android 6.0以上未加入权限申请,去接使用功能会怎样?
 会导致App直接崩溃,所以,时常会在App评论中看到:"太流氓了,不给权限就崩溃",类似的评论
 
-##怎么用?
-###1. 引入EasyPermission
+## 怎么用?
+### 1. 引入EasyPermission
 ```
 dependencies {
 	compile 'pub.devrel:easypermissions:0.3.0'
 }
 ```
 
-###2. 重写Activity或Fragment中的onRequestPermissionsResult方法
+### 2. 重写Activity或Fragment中的onRequestPermissionsResult方法
 并在其中调用EasyPermissions.onRequestPermissionsResult来请求回调,必需加
 
 ```
@@ -61,7 +61,7 @@ public class UseEasyPermissionMainActivity extends AppCompatActivity {
 }
 ```
 
-###3. 实现EasyPermissions.PermissionCallbacks接口,实现两个方法:
+### 3. 实现EasyPermissions.PermissionCallbacks接口,实现两个方法:
 * onPermissionsGranted权限申请成功的回调
 * onPermissionsDenied权限申请拒绝的回调
 
@@ -221,10 +221,10 @@ public class MainActivity extends AppCompatActivity implements EasyPermissions.P
 	}
 ```
 
-###所有流程图大致如下
+### 所有流程图大致如下
 ![](https://shibin1990.gitbooks.io/the-ordinary-road/assets/EasyPermission.png)
 
-###最后EasyPermission还提供了一个可供选择的注解:AfterPermissionGranted
+### 最后EasyPermission还提供了一个可供选择的注解:AfterPermissionGranted
 方法注解,注解中参数是申请权限的请求码.
 被@AfterPermissionGranted注解的方法会在请求码中的所有权限申请成功之后被调用
 
